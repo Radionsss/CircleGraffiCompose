@@ -42,6 +42,7 @@ class MainActivity : ComponentActivity() {
                     SuperSimplePieChartAnimate()
                     SuperSimplePieChartWithIndentation()
                     SuperSimplePieChartNormal()
+                    SuperSimplePieChartNormalBayCenter()
                 }
             }
         }
@@ -179,6 +180,65 @@ fun SuperSimplePieChartWithIndentation() {
 
 @Preview
 @Composable
+fun SuperSimplePieChartNormalBayCenter() {
+    val values = listOf(
+        PieChartItem(10f, Color.Red),
+        PieChartItem(10f, Color.Green),
+        PieChartItem(60f, Color.Yellow),
+        PieChartItem(10f, Color.Blue),
+        PieChartItem(10f, Color.Black)
+    )
+
+    Box(
+        Modifier
+            .size(200.dp) // Set box size to twice the radius
+            .padding(10.dp) // padding for a nice look
+            .drawBehind { // create canvas inside box
+                // Draw circle background for the center of the pie chart
+                val circleSize = 130.dp.toPx() // размер круга
+                drawCircle(
+                    color = Color.Black,
+                    radius = circleSize / 2,
+                    center = Offset(size.width / 2, size.height / 2)
+                )
+
+                var startAngle: Float = 2f // we use the variable to track start angle of each arc
+                values.forEach { // for each value
+                    val sweepAngle =
+                        it.percentage.mapValueToDifferentRange( // we transform it to degrees from 0 to 360
+                            inMin = 0f, // 0%
+                            inMax = 100f, // 100%
+                            outMin = 0f, // 0 degrees
+                            outMax = 360f // Subtract padding angles from total 360 degrees
+                        )
+
+                    // using extension function we draw the arc
+                    drawArc(
+                        color = it.color,
+                        startAngle = startAngle,
+                        sweepAngle = sweepAngle
+                    )
+
+                    startAngle += sweepAngle // increase sweep angle
+                }
+
+                // Draw text in the center of the pie chart
+                val centerX = size.width / 2
+                val centerY = size.height / 2
+                val text = "10000$"
+                val textPaint = Paint().apply {
+                    color = Color.Black.toArgb()
+                    textAlign = Paint.Align.CENTER
+                    textSize = 30f // Set the text size here
+                }
+                drawContext.canvas.nativeCanvas.drawText(text, centerX, centerY, textPaint)
+
+            })
+}
+
+
+@Preview
+@Composable
 fun SuperSimplePieChartNormal() {
     val values = listOf(
         PieChartItem(10f, Color.Red),
@@ -191,10 +251,11 @@ fun SuperSimplePieChartNormal() {
     Box(
         Modifier
             .size(200.dp) // Set box size to twice the radius
-            .background(Color.White) // white background
+            .background(Color.Black) // white background
             .padding(10.dp) // padding for nice look
             .drawBehind { // create canvas inside box
-                var startAngle: Float = 2f // we use the variable to track start angle of each arc
+                var startAngle: Float =
+                    2f // we use the variable to track start angle of each arc
 
                 values.forEach { // for each value // for each value
                     val sweepAngle =
@@ -231,7 +292,6 @@ fun SuperSimplePieChartNormal() {
 }
 
 
-
 private fun Float.mapValueToDifferentRange(
     inMin: Float,
     inMax: Float,
@@ -262,6 +322,7 @@ private fun DrawScope.drawArc(
     )
 
 }
+
 
 
 
